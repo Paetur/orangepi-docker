@@ -1,0 +1,32 @@
+version: '3'
+services:
+  homebridge:
+    container_name: homebridge
+    image: oznu/homebridge:latest
+    volumes:
+      - /opt/homebridge:/homebridge
+    environment:
+      TZ: "${TZ}"
+    logging:
+      driver: json-file
+      options:
+        max-size: "10mb"
+        max-file: "1"
+    network_mode: host
+    depends_on:
+      - mosquitto
+
+  nodered:
+    container_name: nodered
+    image: nodered/node-red
+    ports:
+      - "1880:1880"
+    volumes:
+      - /opt/nodered:/data
+    environment:
+      TZ: "${TZ}"
+    restart: unless-stopped
+    user: "${PUID}:${PGID}"
+    depends_on:
+      - homeassistant
+      - mosquitto
